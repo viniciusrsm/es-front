@@ -1,42 +1,37 @@
 'use client';
 
 import Image from "next/image";
-import Link from "next/link";
 
-export default function Perfil() {
-  const user = {
-    avatar: "/icons8-joker-dc.svg",
-    nome: "João da Silva",
-    email: "joao.silva@example.com",
-    telefone: "(11) 98765-4321",
+export default function RestaurantePerfil() {
+  const restaurante = {
+    nome: "Restaurante A",
+    tipoCozinha: "Italiana",
+    bairro: "Centro",
     cidade: "São Paulo",
-    preferencias: ["Comida Italiana", "Comida Japonesa", "Cafés"],
+    descricao:
+      "Um lugar aconchegante que oferece pratos italianos autênticos feitos com ingredientes frescos e selecionados.",
+    imagem: "/restaurante.jpg", // Substituir com a imagem real
+    avaliacaoMedia: 4.5,
   };
 
-  const restaurantesAvaliados = [
+  const avaliacoes = [
     {
       id: 1,
-      nome: "Restaurante A",
-      tipoCozinha: "Italiana",
-      bairro: "Centro",
-      cidade: "São Paulo",
-      estrelas: 4,
+      usuario: "João da Silva",
+      comentario: "Comida deliciosa, ambiente agradável e ótimo atendimento.",
+      nota: 5,
     },
     {
       id: 2,
-      nome: "Restaurante B",
-      tipoCozinha: "Japonesa",
-      bairro: "Jardins",
-      cidade: "São Paulo",
-      estrelas: 5,
+      usuario: "Maria Oliveira",
+      comentario: "A comida é boa, mas achei o atendimento um pouco demorado.",
+      nota: 4,
     },
     {
       id: 3,
-      nome: "Restaurante C",
-      tipoCozinha: "Brasileira",
-      bairro: "Moema",
-      cidade: "São Paulo",
-      estrelas: 3,
+      usuario: "Carlos Pereira",
+      comentario: "O ambiente é bonito, mas os pratos poderiam ser mais bem servidos.",
+      nota: 3,
     },
   ];
 
@@ -46,98 +41,90 @@ export default function Perfil() {
       <div className="w-full bg-custom1 p-4 flex justify-between items-center shadow-md">
         <div className="flex items-center space-x-2">
           <Image
-            src="/icons8-anonymous-mask.svg"
+            src="/icons8-anonymous-mask.svg" // Substituir com a imagem correta
             alt="logo"
             width={32}
             height={32}
           />
           <span className="text-gray-800 font-semibold text-xl">MenuCheck</span>
         </div>
-        <Link href='/restaurants' className="bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700">Logout</Link>
+        <button className="bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700">
+          Voltar
+        </button>
       </div>
 
-      {/* Main Content */}
+      {/* Informações do Restaurante */}
       <div className="w-full max-w-4xl bg-white mt-8 p-6 rounded-lg shadow-lg">
-        {/* Avatar e Nome */}
-        <div className="flex items-center space-x-4 mb-6">
+        <div className="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-6">
+          {/* Imagem do Restaurante */}
           <Image
-            src={user.avatar}
-            alt="Avatar do usuário"
-            width={96}
-            height={96}
-            className="rounded-full shadow-md"
+            src={restaurante.imagem}
+            alt={`Imagem do ${restaurante.nome}`}
+            width={300}
+            height={200}
+            className="rounded-lg shadow-md"
           />
+          {/* Detalhes */}
           <div>
-            <h1 className="text-2xl font-semibold text-gray-800">{user.nome}</h1>
-            <p className="text-gray-600">{user.email}</p>
+            <h1 className="text-2xl font-semibold text-gray-800">
+              {restaurante.nome}
+            </h1>
+            <p className="text-gray-700">{restaurante.tipoCozinha}</p>
+            <p className="text-gray-700">
+              {restaurante.bairro}, {restaurante.cidade}
+            </p>
+            <p className="mt-4 text-gray-600">{restaurante.descricao}</p>
+            <div className="flex items-center mt-4">
+              <span className="text-yellow-400 text-2xl">★</span>
+              <span className="text-gray-800 text-xl font-semibold ml-2">
+                {restaurante.avaliacaoMedia.toFixed(1)}
+              </span>
+              <span className="text-gray-600 ml-2">
+                ({avaliacoes.length} avaliações)
+              </span>
+            </div>
           </div>
         </div>
+      </div>
 
-        {/* Informações do Usuário */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div>
-            <h2 className="text-lg font-semibold text-gray-800">Telefone</h2>
-            <p className="text-gray-600">{user.telefone}</p>
-          </div>
-          <div>
-            <h2 className="text-lg font-semibold text-gray-800">Cidade</h2>
-            <p className="text-gray-600">{user.cidade}</p>
-          </div>
-        </div>
-
-        {/* Preferências */}
-        <div className="mb-6">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">Preferências</h2>
-          <ul className="list-disc list-inside space-y-2">
-            {user.preferencias.map((pref, index) => (
-              <li key={index} className="text-gray-600">
-                {pref}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Restaurantes Avaliados */}
-        <div>
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">
-            Restaurantes Avaliados
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {restaurantesAvaliados.map((restaurante) => (
-              <div
-                key={restaurante.id}
-                className="bg-custom1 rounded-lg shadow-lg p-4 flex flex-col"
-              >
-                <h3 className="text-lg font-semibold text-gray-900">
-                  {restaurante.nome}
-                </h3>
-                <p className="text-gray-700">{restaurante.tipoCozinha}</p>
-                <p className="text-gray-700">
-                  {restaurante.bairro} / {restaurante.cidade}
-                </p>
-                <div className="flex items-center mt-4">
-                  {/* Estrelas */}
-                  {Array(5)
-                    .fill(null)
-                    .map((_, index) => (
-                      <span
-                        key={index}
-                        className={`${
-                          index < restaurante.estrelas
-                            ? "text-yellow-400"
-                            : "text-gray-400"
-                        } text-lg`}
-                      >
-                        ★
-                      </span>
-                    ))}
+      {/* Avaliações dos Usuários */}
+      <div className="w-full max-w-4xl bg-white mt-8 p-6 rounded-lg shadow-lg">
+        <h2 className="text-lg font-semibold text-gray-800 mb-4">Avaliações</h2>
+        <div className="space-y-6">
+          {avaliacoes.map((avaliacao) => (
+            <div
+              key={avaliacao.id}
+              className="bg-custom2 p-4 rounded-lg shadow-md flex flex-col space-y-2"
+            >
+              <div className="flex items-center space-x-4">
+                <div className="bg-gray-300 w-12 h-12 rounded-full flex items-center justify-center">
+                  <span className="text-gray-600 font-bold text-xl">
+                    {avaliacao.usuario[0]}
+                  </span>
                 </div>
-                <button className="mt-4 bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700">
-                  Ver mais
-                </button>
+                <h3 className="text-gray-800 font-semibold">
+                  {avaliacao.usuario}
+                </h3>
               </div>
-            ))}
-          </div>
+              <p className="text-gray-600">{avaliacao.comentario}</p>
+              <div className="flex items-center">
+                {Array(5)
+                  .fill(null)
+                  .map((_, index) => (
+                    <span
+                      key={index}
+                      className={`${
+                        index < avaliacao.nota
+                          ? "text-yellow-400"
+                          : "text-gray-400"
+                      } text-lg`}
+                    >
+                      ★
+                    </span>
+                  ))}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
