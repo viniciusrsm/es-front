@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 
-export default function RestaurantePerfil() {
+export default function UserPerfil() {
   const restaurante = {
     nome: "Restaurante A",
     tipoCozinha: "Italiana",
