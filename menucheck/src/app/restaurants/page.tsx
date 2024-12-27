@@ -1,8 +1,4 @@
 'use client'
-import AddMenuModal from "@/Models/AddMenuModal";
-import CreateRestaurantModal from "@/Models/CreateRestaurantModal";
-import EditInfoModal from "@/Models/EditInfoModal";
-import ReviewModal from "@/Models/ReviewModal";
 import Image from "next/image";
 import Link from "next/link";
 export default function Restaurants(){
