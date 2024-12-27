@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 
-export default function UserPerfil() {
+export default function User() {
   const user = {
     avatar: "/icons8-anonymous-mask.svg",
     nome: "João da Silva",
