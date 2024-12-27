@@ -6,7 +6,7 @@ export default function ReviewModal() {  // { isOpen, onClose, onSubmit }  Lembr
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
       <div className="bg-gray-900 text-white p-6 rounded-lg w-11/12 max-w-md">
-        <h2 className="text-xl font-semibold mb-4">AVALE O RESTAURANTE</h2>
+        <h2 className="text-xl font-semibold mb-4">AVALIE O RESTAURANTE</h2>
         <p className="mb-2">Avaliação (0 - 5 estrelas)</p>
         <div className="flex gap-1 mb-4">
           {/* Ícones de estrelas */}
