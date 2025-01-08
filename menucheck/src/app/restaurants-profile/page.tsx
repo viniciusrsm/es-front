@@ -6,8 +6,12 @@ import { useState } from "react";
 
 export default function RestaurantePerfil() {
   const [abaAtiva, setAbaAtiva] = useState("avaliacoes");
-  const [menuSelecionado, setMenuSelecionado] = useState(null);
-
+  const [menuSelecionado, setMenuSelecionado] = useState<{
+    id: number;
+    nome: string;
+    pratos: { id: number; nome: string; descricao: string; preco: string }[];
+  } | null>(null);
+  
 
   const restaurante = {
     nome: "Restaurante A",
