@@ -64,7 +64,7 @@ export default function Login() {
       <div className="border-custom1 p-10 rounded-lg shadow-lg max-w-md w-full bg-custom1">
         <div className="flex justify-center mb-6">
           <Image
-            src="/icons8-anonymous-mask.svg"
+            src="assets/icons8-anonymous-mask.svg"
             width={96}
             height={96}
             alt="logo"

@@ -1,9 +1,9 @@
 'use client';
 
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import { useRouter } from 'next/router';
 import { apiService } from "@/service/api";
+import Image from "next/image";
+import { useRouter } from 'next/router';
+import { useEffect, useState } from "react";
 
 // Interfaces
 interface Restaurante {
@@ -106,7 +106,7 @@ export default function RestaurantePerfil({ params }: { params: { id: string } }
       <div className="w-full bg-custom1 p-4 flex justify-between items-center shadow-md">
         <div className="flex items-center space-x-2">
           <Image
-            src='icons8-anonymous-mask.svg' // Substituir com a imagem correta
+            src='assets/icons8-anonymous-mask.svg' // Substituir com a imagem correta
             alt="logo"
             width={32}
             height={32}

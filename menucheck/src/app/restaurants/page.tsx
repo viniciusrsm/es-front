@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 export default function Restaurants() {
   const [restaurants, setRestaurants] = useState<any[]>([]);
-  const [userId, setUserId] = useState<any[]>([]);
+  const [userId, setUserId] = useState<number | null>(null);
   // const [accessToken, setAccessToken] = useState<string | null>(null);
   // useEffect(() => {
   //   // Acesse o sessionStorage somente no cliente
@@ -17,13 +17,16 @@ export default function Restaurants() {
     async function getData() {
       try {
         const resRestaurant = await apiService.get("restaurant"); // Chamada para o backend
-        const resUserId = await apiService.get("auth/user"); // Chamada para o backend
-
+        console.log(resRestaurant)
         setRestaurants(resRestaurant || []); // Armazena a lista de restaurantes no estado
-        setUserId(resUserId.sub); // Armazena o id do usuário no estado
       } catch (error) {
         console.error("Erro ao buscar restaurantes:", error);
       }
+
+      try {
+        const resUserId = await apiService.get("auth/user"); // Chamada para o backend
+        setUserId(resUserId.sub); // Armazena o id do usuário no estado
+      } catch {}
     }
 
     getData(); // Chama a função
@@ -45,7 +48,7 @@ export default function Restaurants() {
       <div className="w-full bg-custom2 p-4 flex justify-between items-center shadow-md">
         <div className="flex items-center bg-custom1 p-4 shadow-md">
           <Image
-            src="icons8-anonymous-mask.svg"
+            src="assets/icons8-anonymous-mask.svg"
             width={48}
             height={48}
             alt="logo"
@@ -54,7 +57,7 @@ export default function Restaurants() {
         </div>
         <div className="flex items-center space-x-4">
           <Image
-            src="icons8-rick-sanchez.svg"
+            src="assets/icons8-rick-sanchez.svg"
             width={48}
             height={48}
             alt="logo"
@@ -79,9 +82,19 @@ export default function Restaurants() {
               key={restaurant.id}
               className="bg-custom1 rounded-lg shadow-lg p-4 flex flex-col"
             >
-              <h3 className="text-lg font-semibold text-gray-900">
-                {restaurant.name}
-              </h3>
+              <div className="flex justify-between">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {restaurant.name}
+                </h3>
+                <div className="flex gap-2">
+                  {(userId == restaurant.userId) ?
+                    <>
+                      <button><Image src={'/assets/pencil.svg'} width={28} height={28} alt="trash" /></button>
+                      <button><Image src={'/assets/trash.svg'} width={28} height={28} alt="trash" /></button>
+                    </> : <></>
+                  }
+                  </div>
+              </div>
               <p className="text-gray-700">
                 {restaurant.description || "Sem descrição disponível"}
               </p>
