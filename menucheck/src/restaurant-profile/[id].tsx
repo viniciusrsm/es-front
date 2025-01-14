@@ -1,28 +1,63 @@
 'use client';
 
+import { apiService } from "@/service/api";
 import Image from "next/image";
-import restaurant_image from "../assets/pizza.png"
-import { useState } from "react";
+import { useRouter } from 'next/router';
+import { useEffect, useState } from "react";
 
-export default function RestaurantePerfil() {
+// Interfaces
+interface Restaurante {
+  id: number;
+  description: string | null;
+  userId: string;
+  name: string;
+  address: string;
+  phone: string;
+}
+
+interface Prato {
+  id: number;
+  nome: string;
+  descricao: string;
+  preco: string;
+}
+
+interface Menu {
+  id: number;
+  nome: string;
+  pratos: Prato[];
+}
+
+
+export default function RestaurantePerfil({ params }: { params: { id: string } }) {
   const [abaAtiva, setAbaAtiva] = useState("avaliacoes");
-  const [menuSelecionado, setMenuSelecionado] = useState<{
-    id: number;
-    nome: string;
-    pratos: { id: number; nome: string; descricao: string; preco: string }[];
-  } | null>(null);
+  const [menuSelecionado, setMenuSelecionado] = useState<Menu | null>(null);
+  const [restaurante, setRestaurante] = useState<Restaurante | null>(null);
+  const router = useRouter();
+  const { id } = router.query; // Obtém o ID da URL
+
   
 
-  const restaurante = {
-    nome: "Restaurante A",
-    tipoCozinha: "Italiana",
-    bairro: "Centro",
-    cidade: "São Paulo",
-    descricao:
-      "Um lugar aconchegante que oferece pratos italianos autênticos feitos com ingredientes frescos e selecionados.",
-    imagem: restaurant_image, // Substituir com a imagem real
-    avaliacaoMedia: 4.5,
-  };
+  useEffect(() => { 
+    console.log("ID recebido:", id); // Adicione isso para depurar
+    async function getRestaurantById() {
+        if (id) {
+          try {
+            const response = await apiService.get(`/restaurant/${params.id}`);
+            console.log(response);
+            setRestaurante(response.data); // Atualize o estado com os dados recebidos
+
+            
+            return response
+          } catch (error) {
+            console.log('Erro ao buscar restaurante especificado:', error);
+          }
+      }
+
+      getRestaurantById(); // Chama a função passando o ID
+    }
+  }, [params.id]);
+
 
   const avaliacoes = [
     {
@@ -65,12 +100,13 @@ export default function RestaurantePerfil() {
   ];
 
   return (
+    
     <div className="min-h-screen bg-slate-100 flex flex-col items-center">
       {/* Header */}
       <div className="w-full bg-custom1 p-4 flex justify-between items-center shadow-md">
         <div className="flex items-center space-x-2">
           <Image
-            src='icons8-anonymous-mask.svg' // Substituir com a imagem correta
+            src='assets/icons8-anonymous-mask.svg' // Substituir com a imagem correta
             alt="logo"
             width={32}
             height={32}
@@ -85,32 +121,23 @@ export default function RestaurantePerfil() {
       {/* Informações do Restaurante */}
       <div className="w-full max-w-4xl bg-white mt-8 p-6 rounded-lg shadow-lg">
         <div className="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-6">
-          {/* Imagem do Restaurante */}
-          <Image
-            src={restaurante.imagem}
-            alt={`Imagem do ${restaurante.nome}`}
-            width={300}
-            height={200}
-            className="rounded-lg shadow-md"
-          />
           {/* Detalhes */}
           <div>
             <h1 className="text-2xl font-semibold text-gray-800">
-              {restaurante.nome}
+              {restaurante?.name}
             </h1>
-            <p className="text-gray-700">{restaurante.tipoCozinha}</p>
             <p className="text-gray-700">
-              {restaurante.bairro}, {restaurante.cidade}
+              {restaurante?.address}
             </p>
-            <p className="mt-4 text-gray-600">{restaurante.descricao}</p>
+            <p className="mt-4 text-gray-600">{restaurante?.description}</p>
             <div className="flex items-center mt-4">
               <span className="text-yellow-400 text-2xl">★</span>
-              <span className="text-gray-800 text-xl font-semibold ml-2">
-                {restaurante.avaliacaoMedia.toFixed(1)}
-              </span>
-              <span className="text-gray-600 ml-2">
+              {/* <span className="text-gray-800 text-xl font-semibold ml-2">
+                {restaurante?.avaliacaoMedia.toFixed(1)}
+              </span> */}
+              {/* <span className="text-gray-600 ml-2">
                 ({avaliacoes.length} avaliações)
-              </span>
+              </span> */}
             </div>
           </div>
         </div>

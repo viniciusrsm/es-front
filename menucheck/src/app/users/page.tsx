@@ -4,7 +4,7 @@ import Image from "next/image";
 
 export default function User() {
   const user = {
-    avatar: "/icons8-anonymous-mask.svg",
+    avatar: "assets/icons8-anonymous-mask.svg",
     nome: "João da Silva",
     email: "joao.silva@example.com",
     telefone: "(11) 98765-4321",
@@ -45,7 +45,7 @@ export default function User() {
       <div className="w-full bg-custom1 p-4 flex justify-between items-center shadow-md">
         <div className="flex items-center space-x-2">
           <Image
-            src="/icons8-anonymous-mask.svg"
+            src="assets/icons8-anonymous-mask.svg"
             alt="logo"
             width={32}
             height={32}
