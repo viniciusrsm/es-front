@@ -3,9 +3,17 @@ import { apiService } from "@/service/api";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import CreateRestaurantDialog from "./createEditDialog";
+import DeleteRestaurantModal from "./deleteDialog";
+
+
+
 export default function Restaurants() {
-  const [restaurants, setRestaurants] = useState<any[]>([]);
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [userId, setUserId] = useState<number | null>(null);
+  const [createModal, setCreateModal] = useState<boolean>(false);
+  const [deleteModal, setDeleteModal] = useState<boolean>(false);
+  const [editData, setEditData] = useState<Restaurant | null>(null);
   // const [accessToken, setAccessToken] = useState<string | null>(null);
   // useEffect(() => {
   //   // Acesse o sessionStorage somente no cliente
@@ -62,12 +70,16 @@ export default function Restaurants() {
             height={48}
             alt="logo"
           />
-          <Link
-            href="/login"
-            className="bg-custom3 text-white py-2 px-4 rounded-md hover:bg-gray-700"
-          >
-            Login
-          </Link>
+          {!userId ? 
+            <Link
+              href="/login"
+              className="bg-custom3 text-white py-2 px-4 rounded-md hover:bg-gray-700"
+            > Login </Link> : 
+            <Link
+              href="/logout"
+              className="bg-custom3 text-white py-2 px-4 rounded-md hover:bg-gray-700"
+            > Logout </Link>
+          }
         </div>
       </div>
 
@@ -89,8 +101,12 @@ export default function Restaurants() {
                 <div className="flex gap-2">
                   {(userId == restaurant.userId) ?
                     <>
-                      <button><Image src={'/assets/pencil.svg'} width={28} height={28} alt="trash" /></button>
-                      <button><Image src={'/assets/trash.svg'} width={28} height={28} alt="trash" /></button>
+                      <button onClick={() => {
+                        setCreateModal(true);
+                        setEditData({id: restaurant.id, userId: restaurant.userId, name: restaurant.name, address: restaurant.address, phone: restaurant.phone, email: restaurant.email, description: restaurant.description, ratings: restaurant.ratings})
+                        }}>
+                          <Image src={'/assets/pencil.svg'} width={28} height={28} alt="trash" /></button>
+                      <button onClick={() => setDeleteModal(true)}><Image src={'/assets/trash.svg'} width={28} height={28} alt="trash" /></button>
                     </> : <></>
                   }
                   </div>
@@ -122,7 +138,7 @@ export default function Restaurants() {
                 </span>
               </div>
 
-              <Link href={`/restaurant-profile/${restaurant.id}`}>
+              <Link href={`/restaurant-profile/${restaurant.id}`} className="w-fit">
                 <button className="mt-4 bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700">
                   Ver mais
                 </button>
@@ -131,6 +147,8 @@ export default function Restaurants() {
           ))}
         </div>
       </div>
+      <CreateRestaurantDialog open={createModal} setOpen={setCreateModal} infos={editData} />
+      <DeleteRestaurantModal open={deleteModal} setOpen={setDeleteModal} />
     </div>
   );
 }
