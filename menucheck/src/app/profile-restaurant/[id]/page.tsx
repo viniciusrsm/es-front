@@ -5,43 +5,8 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation"; // Atualizado para usar useParams
 import Link from "next/link";
-import ReviewModal from "@/Models/ReviewModal";
 import ReviewDialog from "./reviewDialog";
 
-// Interfaces
-interface Restaurante {
-    id: number;
-    userId: number;
-    name: string;
-    address: string;
-    phone: string;
-    email: string;
-    description: string;
-    ratings: Rating[];
-}
-
-interface Rating {
-    id: number;
-    userId: number;
-    stars: number;
-    description: number;
-    restaurantId: number;
-}
-
-interface Menu {
-    id: number;
-    name: string;
-    userId: number;
-    restaurantId: number;
-}
-
-interface MenuItem {
-    id: number;
-    name: string;
-    desc: string;
-    price: number;
-    menuId: number;
-}
 
 
 export default function RestaurantePerfil() {
@@ -49,6 +14,7 @@ export default function RestaurantePerfil() {
   const [menuSelecionado, setMenuSelecionado] = useState<Menu | null>(null);
   const [reviewModal, setReviewModal] = useState<boolean>(false);
   const [userId, setUserId] = useState<number | null>(null);
+  const [username, setUsername] = useState<string | null>(null); // Novo estado para o nome do usuário
   const [restaurante, setRestaurante] = useState<Restaurante | null>(null);
   const [userNames, setUserNames] = useState<{ [key: number]: string }>({}); // Mapeamento de userId para username
   const [avaliacoes, setAvaliacoes] = useState<Rating[]>([]);
@@ -94,11 +60,15 @@ function handleLogout() {
 
       try {
         const resUserId = await apiService.get("auth/user"); // Chamada para o backend
+        console.log(resUserId);
+        
         setUserId(resUserId.sub); // Armazena o id do usuário no estado
+        setUsername(resUserId.username)
       } catch {}
 
       try {
-        const resMenus = await apiService.get(`/menu/find/${id}`)
+        const resMenus = await apiService.get(`/menu/by/restaurant/${id}`)
+        console.log(resMenus)
         setMenu(resMenus);
       } catch (error) {
         console.error("Erro ao buscar menus:", error);
@@ -139,15 +109,17 @@ function handleLogout() {
     <div className="min-h-screen bg-slate-100 flex flex-col items-center">
       {/* Header */}
       <div className="w-full bg-custom2 p-4 flex justify-between items-center shadow-md">
-            <div className="flex items-center bg-custom1 p-4 shadow-md">
-            <Image
-                src="/assets/icons8-anonymous-mask.svg"
-                width={48}
-                height={48}
-                alt="logo"
-            />
-            <h1 className="text-xl font-semibold text-gray-800">MenuCheck</h1>
-            </div>
+            <Link href='/restaurants'>
+                <div className="flex items-center bg-custom1 p-4 shadow-md">
+                  <Image
+                    src="/assets/icons8-anonymous-mask.svg"
+                    width={48}
+                    height={48}
+                    alt="logo"
+                  />
+                  <h1 className="text-xl font-semibold text-gray-800">MenuCheck</h1>
+                </div>
+            </Link>
             <div className="flex items-center space-x-4">
 
             {!userId ? 
@@ -157,13 +129,20 @@ function handleLogout() {
                 > 
                     Login 
                 </Link> : 
-                <Link
-                    href="/"
-                    onClick={handleLogout} // Função de logout
-                    className="bg-custom3 text-white py-2 px-4 rounded-md hover:bg-gray-700"
-                > 
-                    Logout 
-                </Link>
+                <>
+                  <Link href={`/profile-user/${userId}`}>
+                    <div className="flex items-center rounded-lg bg-custom1 p-3 shadow-md">
+                      <h1 className="rounded-lg font-semibold  text-gray-600">{username ? `${username}` : "Carregando..."}</h1>
+                    </div>
+                  </Link>
+                  <Link
+                      href="/"
+                      onClick={handleLogout} // Função de logout
+                      className="bg-custom3 text-white py-2 px-4 rounded-md hover:bg-gray-700"
+                  > 
+                      Logout 
+                  </Link>
+                </>
             }
             </div>
         </div>
@@ -174,12 +153,12 @@ function handleLogout() {
           {/* Detalhes */}
           <div>
             <h1 className="text-2xl font-semibold text-gray-800">
-              {restaurante?.name}
+              {`Restaurante: ${restaurante?.name}`}
             </h1>
-            <p className="text-gray-700">
-              {restaurante?.address}
+            <p className="text-gray-700 mt-2">
+            {`Bairro/Cidade: ${restaurante?.address}`}
             </p>
-            <p className="mt-4 text-gray-600">{restaurante?.description}</p>
+            <p className="mt-4 text-gray-600">{`Descrição: ${restaurante?.description}`}</p>
             <div className="flex items-center mt-4">
               <span className="text-yellow-400 text-2xl">★</span>
                <span className="text-gray-600 ml-2 mr-6">
@@ -313,7 +292,13 @@ function handleLogout() {
         </div>
       )}
       </div>
-      <ReviewDialog open={reviewModal} setOpen={setReviewModal}/>
+      <ReviewDialog 
+          open={reviewModal}
+          setOpen={setReviewModal}
+          userId={id && typeof id === "string" ? parseInt(id, 10) : undefined} // Exemplo: passar o ID do usuário
+          restaurantId={restaurante?.id} // Exemplo: passar o ID do restaurante
+      />
+      
     </div>
   );
 }

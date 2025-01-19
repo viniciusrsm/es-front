@@ -1,4 +1,5 @@
-interface Restaurant {
+// Interfaces
+interface Restaurante {
   id: number;
   userId: number;
   name: string;
@@ -7,6 +8,8 @@ interface Restaurant {
   email: string;
   description: string;
   ratings: Rating[];
+  ratingsCount: number; // Quantidade de avaliações
+  averageRating: number; // Nota média
 }
 
 interface Rating {
@@ -15,4 +18,24 @@ interface Rating {
   stars: number;
   description: number;
   restaurantId: number;
+}
+
+interface User {
+  name: string;
+  username: string;
+}
+
+interface Menu {
+  id: number;
+  name: string;
+  userId: number;
+  restaurantId: number;
+}
+
+interface MenuItem {
+  id: number;
+  name: string;
+  desc: string;
+  price: number;
+  menuId: number;
 }
