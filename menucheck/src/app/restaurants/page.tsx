@@ -11,22 +11,31 @@ import DeleteRestaurantModal from "./deleteDialog";
 export default function Restaurants() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [userId, setUserId] = useState<number | null>(null);
+  const [avaliacoes, setAvaliacoes] = useState<Rating[]>([]); 
   const [createModal, setCreateModal] = useState<boolean>(false);
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
   const [editData, setEditData] = useState<Restaurant | null>(null);
-  // const [accessToken, setAccessToken] = useState<string | null>(null);
-  // useEffect(() => {
-  //   // Acesse o sessionStorage somente no cliente
-  //   const token = sessionStorage.getItem('accessToken');
-  //   setAccessToken(token);
-  // }, []);
+
+  function handleLogout() {
+    sessionStorage.removeItem("access_token"); // Remove o token salvo
+    setUserId(null); // Limpa o estado de autenticação (se necessário)
+    window.location.href = "/login"; // Redireciona para a página inicial
+  }
 
   useEffect(() => {
     async function getData() {
       try {
-        const resRestaurant = await apiService.get("restaurant"); // Chamada para o backend
-        console.log(resRestaurant)
-        setRestaurants(resRestaurant || []); // Armazena a lista de restaurantes no estado
+        const resRestaurant = await apiService.get("restaurant"); // Busca restaurantes
+        const restaurantsWithRatings = await Promise.all(
+          resRestaurant.map(async (restaurant: any) => {
+            const ratings = await apiService.get(`rating/allRatings/${restaurant.id}`);
+            const averageRating = calculateAverageStars(ratings);
+            console.log(averageRating);
+            
+              return { ...restaurant, averageRating, ratings: ratings.length };
+          })
+        );
+        setRestaurants(restaurantsWithRatings);
       } catch (error) {
         console.error("Erro ao buscar restaurantes:", error);
       }
@@ -35,19 +44,22 @@ export default function Restaurants() {
         const resUserId = await apiService.get("auth/user"); // Chamada para o backend
         setUserId(resUserId.sub); // Armazena o id do usuário no estado
       } catch {}
+
+      try {
+        const resRating = await apiService.get(`/rating/only/ratings`)        
+        setAvaliacoes(resRating || [])
+      } catch (error) {
+        console.error("Erro ao buscar avaliações:", error);
+      }
     }
 
     getData(); // Chama a função
   }, []); // Adiciona dependência vazia para executar apenas uma vez
 
-  // Função para calcular a média de estrelas das avaliações
-  function calculateAverageStars(ratings: any) {
+  function calculateAverageStars(ratings: any[]): number {
     if (!ratings || ratings.length === 0) return 0;
-    const totalStars = ratings.reduce(
-      (sum: any, rating: any) => sum + rating.stars,
-      0
-    );
-    return Math.round(totalStars / ratings.length); // Arredonda a média
+    const totalStars = ratings.reduce((sum, rating) => sum + rating.stars, 0);
+    return totalStars / ratings.length; // Média correta: soma / quantidade
   }
 
   return (
@@ -56,7 +68,7 @@ export default function Restaurants() {
       <div className="w-full bg-custom2 p-4 flex justify-between items-center shadow-md">
         <div className="flex items-center bg-custom1 p-4 shadow-md">
           <Image
-            src="assets/icons8-anonymous-mask.svg"
+            src="/assets/icons8-anonymous-mask.svg"
             width={48}
             height={48}
             alt="logo"
@@ -64,19 +76,14 @@ export default function Restaurants() {
           <h1 className="text-xl font-semibold text-gray-800">MenuCheck</h1>
         </div>
         <div className="flex items-center space-x-4">
-          <Image
-            src="assets/icons8-rick-sanchez.svg"
-            width={48}
-            height={48}
-            alt="logo"
-          />
           {!userId ? 
             <Link
               href="/login"
               className="bg-custom3 text-white py-2 px-4 rounded-md hover:bg-gray-700"
             > Login </Link> : 
             <Link
-              href="/logout"
+              href="/"
+              onClick={handleLogout} // Função de logout
               className="bg-custom3 text-white py-2 px-4 rounded-md hover:bg-gray-700"
             > Logout </Link>
           }
@@ -99,7 +106,7 @@ export default function Restaurants() {
                   {restaurant.name}
                 </h3>
                 <div className="flex gap-2">
-                  {(userId == restaurant.userId) ?
+                  {(userId == restaurant.userId) ?                    
                     <>
                       <button onClick={() => {
                         setCreateModal(true);
@@ -118,14 +125,13 @@ export default function Restaurants() {
               <p className="text-gray-700">Telefone: {restaurant.phone}</p>
 
               <div className="flex items-center mt-4">
-                {/* Exibe a média de estrelas calculada */}
                 {Array(5)
                   .fill(null)
                   .map((_, index) => (
                     <span
                       key={index}
                       className={`${
-                        index < calculateAverageStars(restaurant.ratings)
+                        index < Math.floor(restaurant.averageRating)
                           ? "text-yellow-400"
                           : "text-gray-400"
                       } text-lg`}
@@ -134,11 +140,11 @@ export default function Restaurants() {
                     </span>
                   ))}
                 <span className="ml-2 text-gray-600">
-                  ({restaurant.ratings?.length || 0} avaliações)
+                  ({restaurant.ratings || 0} avaliações)
                 </span>
               </div>
 
-              <Link href={`/restaurant-profile/${restaurant.id}`} className="w-fit">
+              <Link href={`/profile-restaurant/${restaurant.id}`} className="w-fit">
                 <button className="mt-4 bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700">
                   Ver mais
                 </button>

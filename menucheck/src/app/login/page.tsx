@@ -116,12 +116,20 @@ export default function Login() {
           </div>
         </form>
 
-        <div>
+        <div className="text-center text-sm mt-4 text-gray-700">
           <span className="text-center text-sm mt-4 text-gray-700">
             Não possui conta?{" "}
             <Link href="/register" className="text-gray-900">
               Registre-se
             </Link>
+          </span>
+          <p className="text-center text-sm mt-4 text-gray-700 my-4">
+            -OU-
+          </p>
+          <span className="text-center text-sm mt-4 text-gray-900">
+              <Link href={"/restaurants"} >
+                  Clique para continar sem Login
+              </Link>
           </span>
         </div>
       </div>
