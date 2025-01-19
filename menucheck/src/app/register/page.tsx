@@ -24,7 +24,6 @@ export default function Register(){
             senha: Yup.string().required('O campo Senha é obrigatório'),
         }),        
         onSubmit: async (values, { setSubmitting }) => {
-        console.log(values);
         
         console.log("submiting")
 

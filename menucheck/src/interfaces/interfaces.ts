@@ -16,7 +16,7 @@ interface Rating {
   id: number;
   userId: number;
   stars: number;
-  description: number;
+  description: string;
   restaurantId: number;
 }
 

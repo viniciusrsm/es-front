@@ -31,6 +31,7 @@ export default function ReviewDialog(props: ReviewDialogProps){
             restaurantId,
           });
           
+          
           setOpen(false); // Fecha o modal
           setStars(undefined); // Reseta os campos
           setDescription("");

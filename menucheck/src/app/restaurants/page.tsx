@@ -32,7 +32,6 @@ export default function Restaurants() {
           resRestaurant.map(async (restaurant: any) => {
             const ratings = await apiService.get(`rating/allRatings/${restaurant.id}`);
             const averageRating = calculateAverageStars(ratings);
-            console.log(averageRating);
             
               return { ...restaurant, averageRating, ratingsCount: ratings.length };
           })

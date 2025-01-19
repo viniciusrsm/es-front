@@ -36,7 +36,6 @@ export default function CreateDialog(props: CreateDialogProps) {
         description,
         userId,
       });
-      console.log(response);
 
       alert("Restaurante criado com sucesso!");
       setOpen(false); // Fecha o modal
