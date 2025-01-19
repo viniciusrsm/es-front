@@ -6,6 +6,12 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation"; // Atualizado para usar useParams
 import Link from "next/link";
 import ReviewDialog from "./reviewDialog";
+import EditReviewDialog from "./editReviewDialog";
+import CreateMenuDialog from "./createMenuDialog";
+import DeleteReviewDialog from "./deleteReviewDialog";
+import EditMenuDialog from "./editMenuDialog";
+import DeleteMenuDialog from "./deleteMenuDialog";
+import CreateMenuItemDialog from "./createMenuItemDialog";
 
 
 
@@ -13,6 +19,12 @@ export default function RestaurantePerfil() {
   const [abaAtiva, setAbaAtiva] = useState("avaliacoes");
   const [menuSelecionado, setMenuSelecionado] = useState<Menu | null>(null);
   const [reviewModal, setReviewModal] = useState<boolean>(false);
+  const [editReviewModal, setEditReviewModal] = useState<boolean>(false);
+  const [deleteReviewModal, setDeleteReviewModal] = useState<boolean>(false);
+  const [createMenuModal, setCreateMenuModal] = useState<boolean>(false);
+  const [editMenuModal, setEditMenuModal] = useState<boolean>(false);
+  const [deleteMenuModal, setDeleteMenuModal] = useState<boolean>(false);
+  const [createMenuItemModal, setCreateMenuItemModal] = useState<boolean>(false);
   const [userId, setUserId] = useState<number | null>(null);
   const [username, setUsername] = useState<string | null>(null); // Novo estado para o nome do usuário
   const [restaurante, setRestaurante] = useState<Restaurante | null>(null);
@@ -20,6 +32,11 @@ export default function RestaurantePerfil() {
   const [avaliacoes, setAvaliacoes] = useState<Rating[]>([]);
   const [menu, setMenu] = useState<Menu[]>([]);
   const [menuItem, setMenuItem] = useState<MenuItem[]>([]); 
+  const [editReview, setEditReview] = useState<Rating | null>(null);
+  const [editMenu, setEditMenu] = useState<Menu | null>(null);
+  const [selectedMenuId, setSelectedMenuId] = useState<number | null>(null);
+  const [selectedMenuItemId, setSelectedMenuItemId] = useState<number | null>(null);
+  const [selectedAvaliacaoId, setSelectedAvaliacaoId] = useState<number | null>(null);
   const { id } = useParams(); // Use o hook useParams para obter os parâmetros da URL
 
   async function getPratos(pratosId: number) {
@@ -52,7 +69,6 @@ function handleLogout() {
       try {
         const resRating = await apiService.get(`/rating/allRatings/${id}`)
         setAvaliacoes(resRating || [])
-        console.log(resRating);
         
       } catch (error) {
         console.error("Erro ao buscar avaliações:", error);
@@ -60,7 +76,6 @@ function handleLogout() {
 
       try {
         const resUserId = await apiService.get("auth/user"); // Chamada para o backend
-        console.log(resUserId);
         
         setUserId(resUserId.sub); // Armazena o id do usuário no estado
         setUsername(resUserId.username)
@@ -68,7 +83,6 @@ function handleLogout() {
 
       try {
         const resMenus = await apiService.get(`/menu/by/restaurant/${id}`)
-        console.log(resMenus)
         setMenu(resMenus);
       } catch (error) {
         console.error("Erro ao buscar menus:", error);
@@ -164,20 +178,28 @@ function handleLogout() {
                <span className="text-gray-600 ml-2 mr-6">
                 ({avaliacoes?.length} avaliações)
               </span>
-              {!userId ?
-                <p className="text-gray-800">
-                  Logue para avaliar!
-                </p>
-                :
-                <button 
-                  className={`flex-1 p-2 rounded-lg font-semibold shadow-md bg-custom1 text-white`}
-                  onClick={() => {
-                    setReviewModal(true);
-                  }}
-                >
-                  Avalie
-                </button>
-              }
+              {!userId ? (
+                  <p className="text-gray-800">
+                    Logue para avaliar!
+                  </p>
+                ) : (
+                  abaAtiva === "avaliacoes" ? (
+                    <button
+                      className="flex-1 p-2 rounded-lg font-semibold shadow-md bg-custom1 text-white"
+                      onClick={() => setReviewModal(true)}
+                    >
+                      Avalie
+                    </button>
+                  ) : abaAtiva === "menu" && userId === restaurante?.userId? (
+                    <button
+                      className="flex-1 p-2 rounded-lg font-semibold shadow-md bg-custom1 text-white"
+                      onClick={() => setCreateMenuModal(true)}
+                    >
+                      Crie Menu
+                    </button>
+                  ) : null
+              )}
+
             </div>
 
           </div>
@@ -206,7 +228,12 @@ function handleLogout() {
       </div>
       {abaAtiva === "avaliacoes" && (
         <div className="w-full max-w-4xl bg-white mt-8 p-6 rounded-lg shadow-lg">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">Avaliações</h2>
+          <div>
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">Avaliações</h2>
+            <button>
+
+            </button>
+          </div>
           <div className="space-y-6">
             {avaliacoes?.map((avaliacao) => (
               <div
@@ -218,6 +245,47 @@ function handleLogout() {
                   <h3 className="text-gray-800 font-semibold">
                   {userNames[avaliacao.userId] || "Usuário Desconhecido"}
                   </h3>
+                  <div className="flex gap-2 ml-auto">
+                    {(userId === avaliacao.userId) && (
+                      <>
+                        {/* Botão de editar */}
+                        <button
+                          onClick={() => {
+                            setEditReviewModal(true);
+                            setEditReview({
+                              id: avaliacao.id,
+                              userId: avaliacao.userId,
+                              stars: avaliacao.stars,
+                              description: avaliacao.description,
+                              restaurantId: avaliacao.restaurantId
+                            });
+                          }}
+                        >
+                          <Image
+                            src={'/assets/pencil.svg'}
+                            width={24}
+                            height={24}
+                            alt="Editar avaliação"
+                          />
+                        </button>
+
+                        {/* Botão de deletar */}
+                        <button
+                          onClick={() => {
+                            setSelectedAvaliacaoId(avaliacao.id);
+                            setDeleteReviewModal(true);
+                          }}
+                        >
+                          <Image
+                            src={'/assets/trash.svg'}
+                            width={24}
+                            height={24}
+                            alt="Deletar avaliação"
+                          />
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
                 <p className="text-gray-600">{avaliacao.description}</p>
                 <div className="flex items-center">
@@ -255,7 +323,49 @@ function handleLogout() {
                     await getPratos(menu.id);
                 }}
               >
-                <h3 className="text-gray-800 font-semibold">{menu.name}</h3>
+                <h3 className="text-gray-800 font-semibold">
+                  {menu.name}
+                </h3>
+                <div className="flex gap-2 ml-auto">
+                    {(userId === menu.userId) && (
+                      <>
+                        {/* Botão de editar */}
+                        <button
+                          onClick={() => {
+                            setEditMenuModal(true);
+                            setEditMenu({
+                              id: menu.id,
+                              name: menu.name,
+                              userId: menu.userId,
+                              restaurantId: menu.restaurantId
+                            });
+                          }}
+                        >
+                          <Image
+                            src={'/assets/pencil.svg'}
+                            width={24}
+                            height={24}
+                            alt="Editar avaliação"
+                          />
+                        </button>
+
+                        {/* Botão de deletar */}
+                        <button
+                          onClick={() => {
+                            setSelectedMenuId(menu.id);
+                            setDeleteMenuModal(true);
+                          }}
+                        >
+                          <Image
+                            src={'/assets/trash.svg'}
+                            width={24}
+                            height={24}
+                            alt="Deletar avaliação"
+                          />
+                        </button>
+                      </>
+                    )}
+                  </div>
               </div>
             ))}
           </div>
@@ -277,6 +387,19 @@ function handleLogout() {
               </button>
             </div>
             <div className="space-y-4">
+            {userId === menuSelecionado.userId && (
+              <button
+                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                onClick={() => {
+                  setCreateMenuItemModal(true);
+                  setSelectedMenuId(menuSelecionado.id);
+                }
+                } // Abre o modal de adicionar prato
+              >
+                Adicionar Prato
+              </button>
+            )}
+
                 {menuItem && menuItem.length > 0 && menuItem.map((prato: MenuItem) => (
                     <div
                         key={prato.id}
@@ -295,10 +418,15 @@ function handleLogout() {
       <ReviewDialog 
           open={reviewModal}
           setOpen={setReviewModal}
-          userId={id && typeof id === "string" ? parseInt(id, 10) : undefined} // Exemplo: passar o ID do usuário
+          userId={userId!} // Exemplo: passar o ID do usuário
           restaurantId={restaurante?.id} // Exemplo: passar o ID do restaurante
       />
-      
+      <EditReviewDialog open={editReviewModal} setOpen={setEditReviewModal} infos={editReview as Rating | null}/>
+      <DeleteReviewDialog open={deleteReviewModal} setOpen={setDeleteReviewModal} id={selectedAvaliacaoId!}/>
+      <EditMenuDialog open={editMenuModal} setOpen={setEditMenuModal} infos={editMenu as Menu | null}/>
+      <DeleteMenuDialog open={deleteMenuModal} setOpen={setDeleteMenuModal} id={selectedMenuId!}/>
+      <CreateMenuDialog open={createMenuModal} setOpen={setCreateMenuModal} userId={userId!} restaurantId={restaurante?.id!}/>
+      <CreateMenuItemDialog open={createMenuItemModal} setOpen={setCreateMenuItemModal} menuId={selectedMenuId!}/>
     </div>
   );
 }

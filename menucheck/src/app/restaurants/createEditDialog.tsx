@@ -57,7 +57,6 @@ export default function CreateEditDialog(props: CreateEditDialogProps){
         description,
         userId: infos?.userId,
       });
-      console.log(response);
       
 
       alert("Restaurante atualizado com sucesso!");
