@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation"; // Atualizado para usar useParams
 import Link from "next/link";
-import ReviewModal from "@/Models/ReviewModal";
 import ReviewDialog from "./reviewDialog";
 
 // Interfaces
@@ -94,6 +93,8 @@ function handleLogout() {
 
       try {
         const resUserId = await apiService.get("auth/user"); // Chamada para o backend
+        console.log(resUserId);
+        
         setUserId(resUserId.sub); // Armazena o id do usuário no estado
       } catch {}
 
@@ -313,7 +314,12 @@ function handleLogout() {
         </div>
       )}
       </div>
-      <ReviewDialog open={reviewModal} setOpen={setReviewModal}/>
+      <ReviewDialog 
+          open={reviewModal}
+          setOpen={setReviewModal}
+          userId={id && typeof id === "string" ? parseInt(id, 10) : undefined} // Exemplo: passar o ID do usuário
+          restaurantId={restaurante?.id} // Exemplo: passar o ID do restaurante
+      />
     </div>
   );
 }

@@ -14,6 +14,7 @@ export default function Restaurants() {
   const [avaliacoes, setAvaliacoes] = useState<Rating[]>([]); 
   const [createModal, setCreateModal] = useState<boolean>(false);
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
+  const [selectedRestaurantId, setSelectedRestaurantId] = useState<number | null>(null);
   const [editData, setEditData] = useState<Restaurant | null>(null);
 
   function handleLogout() {
@@ -45,12 +46,6 @@ export default function Restaurants() {
         setUserId(resUserId.sub); // Armazena o id do usuário no estado
       } catch {}
 
-      try {
-        const resRating = await apiService.get(`/rating/only/ratings`)        
-        setAvaliacoes(resRating || [])
-      } catch (error) {
-        console.error("Erro ao buscar avaliações:", error);
-      }
     }
 
     getData(); // Chama a função
@@ -113,7 +108,14 @@ export default function Restaurants() {
                         setEditData({id: restaurant.id, userId: restaurant.userId, name: restaurant.name, address: restaurant.address, phone: restaurant.phone, email: restaurant.email, description: restaurant.description, ratings: restaurant.ratings})
                         }}>
                           <Image src={'/assets/pencil.svg'} width={28} height={28} alt="trash" /></button>
-                      <button onClick={() => setDeleteModal(true)}><Image src={'/assets/trash.svg'} width={28} height={28} alt="trash" /></button>
+                      <button 
+                        onClick={() => {
+                          setSelectedRestaurantId(restaurant.id)
+                          setDeleteModal(true)
+                          }
+                        }
+                      >
+                        <Image src={'/assets/trash.svg'} width={28} height={28} alt="trash" /></button>
                     </> : <></>
                   }
                   </div>
@@ -154,7 +156,7 @@ export default function Restaurants() {
         </div>
       </div>
       <CreateRestaurantDialog open={createModal} setOpen={setCreateModal} infos={editData} />
-      <DeleteRestaurantModal open={deleteModal} setOpen={setDeleteModal} />
+      <DeleteRestaurantModal open={deleteModal} setOpen={setDeleteModal} restaurantId={selectedRestaurantId || undefined}/>
     </div>
   );
 }
